@@ -1,16 +1,28 @@
+use std::error::Error;
 use std::io::{self, Read, Write};
 use std::net::TcpStream;
 use serde::{Serialize, Deserialize};
 use serde_json;
 
 fn main() {
-    let stream = TcpStream::connect("localhost:7878").unwrap();
-    let mut service = Service { stream };
+    match TcpStream::connect("localhost:7878") {
+        Ok(mut stream) => {
+            println!("connexion ok");
 
-    let result1 = service.send_message("\"Hello\"");
-    print!("1. {}\n", result1);
-    let result2 = service.send_message("{\"Subscribe\":{\"name\":\"free_patato\"}}");
-    print!("2. {}\n", result2);
+            let mut service = Service {
+                stream,
+            };
+
+            let res = service.send_message("\"Hello\"");
+            println!("response: {}", res);
+
+            let res = service.send_message("{\"Subscribe\":{\"name\":\"free_potato\"}}");
+            println!("response: {}", res);
+        }
+        Err(e) => {
+            println!("connexion niquée");
+        }
+    }
 }
 
 struct Service {
@@ -19,13 +31,12 @@ struct Service {
 
 impl Service {
     fn send_message(&mut self, message: &str) -> String {
+        println!("sending: {}", message);
         let message_size = message.len() as u32;
         self.stream.write_all(&message_size.to_be_bytes());
-        self.stream.write_all(message.as_bytes());
+        self.stream.write_all(&message.as_bytes());
         let mut response = String::new();
         self.stream.read_to_string(&mut response);
         response
     }
 }
-
-
