@@ -8,14 +8,15 @@ use crate::messages::*;
 use crate::service::*;
 
 fn main() {
-    let stream = match TcpStream::connect("localhost:7878") {
-        Ok(stream) => stream,
-        Err(e) => {
-            println!("Could not connect to the server: {}", e);
-            return;
+    let mut service = Service {
+        stream: match TcpStream::connect("localhost:7878") {
+            Ok(stream) => stream,
+            Err(e) => {
+                println!("Could not connect to the server: {}", e);
+                return;
+            }
         }
     };
-    let mut service = Service { stream };
 
     let message = Message::Hello;
     let mut serialized_message = serde_json::to_string(&message).unwrap();
@@ -32,4 +33,28 @@ fn main() {
     serialized_message = serde_json::to_string(&Message::Subscribe(subscribe)).unwrap();
     let result2 = service.send_message(&serialized_message);
     println!("resp 2. {}", result2);
+}
+
+struct Service {
+    stream: TcpStream,
+}
+
+impl Service {
+    fn send_message(&mut self, message: &str) -> String {
+        let message_size = message.len() as u32;
+        self.stream.write_all(&message_size.to_be_bytes());
+        self.stream.write_all(message.as_bytes());
+
+        let mut buffer: &mut[u8] = &mut [0; 4];
+        self.stream.read_exact(buffer);
+
+        let mut response_message = String::new();
+        match self.stream.read_to_string(&mut response_message) {
+            Ok(_) => response_message,
+            Err(e) => {
+                println!("{}", e);
+                response_message
+            }
+        }
+    }
 }
