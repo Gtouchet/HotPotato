@@ -1,11 +1,11 @@
 mod responses;
 mod messages;
+mod service;
 
-use std::io::{self, Read, Write};
 use std::net::TcpStream;
 use serde_json;
-use serde::{Serialize, Deserialize};
 use crate::messages::*;
+use crate::service::*;
 
 fn main() {
     let stream = match TcpStream::connect("localhost:7878") {
@@ -32,45 +32,4 @@ fn main() {
     serialized_message = serde_json::to_string(&Message::Subscribe(subscribe)).unwrap();
     let result2 = service.send_message(&serialized_message);
     println!("resp 2. {}", result2);
-}
-
-struct Service {
-    stream: TcpStream,
-}
-
-impl Service {
-    fn send_message(&mut self, message: &str) -> String {
-        println!("send_message: {}", message);
-
-        let message_size = message.len() as u32;
-        match self.stream.write_all(&message_size.to_be_bytes()) {
-            Ok(r) => {
-                println!("\twrite_all size {}: ok", message_size);
-            },
-            Err(e) => {
-                println!("\twrite_all size error: {}", e);
-            }
-        };
-
-        match self.stream.write_all(message.as_bytes()) {
-            Ok(r) => {
-                println!("\twrite_all message ok");
-            },
-            Err(e) => {
-                println!("\twrite_all message error: {}", e);
-            }
-        };
-
-        let mut response = String::new();
-        match self.stream.read_to_string(&mut response) {
-            Ok(r) => {
-                println!("\tread_to_string ok");
-                response
-            }
-            Err(e) => {
-                println!("\tread_to_string error: {}", e);
-                String::new()
-            }
-        }
-    }
 }
