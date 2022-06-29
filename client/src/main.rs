@@ -20,6 +20,16 @@ fn main()
         }
     };
 
+    let message = Message::Hello;
+    let mut serialized_message = match serde_json::to_string(&message) {
+        Ok(m) => m,
+        Err(e) => {
+            println!("Could not serialize the message: {}", e);
+            return;
+        }
+    };
+    let result1 = service.send_message(&serialized_message);
+    println!("1. {:?}", result1);
     let mut message = Message::Hello;
     let mut serialized_message = serde_json::to_string(&message).unwrap();
     let result_from_hello = service.send_message(&serialized_message);
