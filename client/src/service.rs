@@ -1,42 +1,26 @@
 use std::net::TcpStream;
 use std::io::{self, Read, Write};
-pub struct Service {
-    pub stream: TcpStream,
+
+pub struct Service
+{
+    pub(crate) stream: TcpStream,
 }
 
-impl Service {
-    pub fn send_message(&mut self, message: &str) -> String {
-        println!("send_message: {}", message);
-
+impl Service
+{
+    pub(crate) fn send_message(&mut self, message: &str) -> String
+    {
         let message_size = message.len() as u32;
-        match self.stream.write_all(&message_size.to_be_bytes()) {
-            Ok(r) => {
-                println!("\twrite_all size {}: ok", message_size);
-            },
-            Err(e) => {
-                println!("\twrite_all size error: {}", e);
-            }
-        };
+        self.stream.write_all(&message_size.to_be_bytes());
+        self.stream.write_all(message.as_bytes());
 
-        match self.stream.write_all(message.as_bytes()) {
-            Ok(r) => {
-                println!("\twrite_all message ok");
-            },
-            Err(e) => {
-                println!("\twrite_all message error: {}", e);
-            }
-        };
+        let mut buffer: &mut[u8] = &mut [0; 4];
+        self.stream.read_exact(&mut buffer);
+        let response_message_size = u32::from_be_bytes(buffer.try_into().unwrap());
 
-        let mut response = String::new();
-        match self.stream.read_to_string(&mut response) {
-            Ok(r) => {
-                println!("\tread_to_string ok");
-                response
-            }
-            Err(e) => {
-                println!("\tread_to_string error: {}", e);
-                String::new()
-            }
-        }
+        let mut response_buffer = vec![0; response_message_size as usize];
+        self.stream.read_exact(&mut response_buffer);
+
+        String::from_utf8(response_buffer.try_into().unwrap()).unwrap()
     }
 }
