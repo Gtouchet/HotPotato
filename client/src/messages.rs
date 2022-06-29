@@ -4,16 +4,17 @@ use serde::{Serialize, Deserialize};
 pub enum Message {
     Hello,
     Welcome(Welcome),
+    Subscribe(Subscribe)
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Welcome {
-    version: u8,
+    pub version: u8,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Subscribe {
-    name: String
+    pub name: String
 }
 
 #[derive(Debug, Serialize, Deserialize)]
