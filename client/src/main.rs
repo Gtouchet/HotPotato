@@ -20,13 +20,22 @@ fn main()
         }
     };
 
-    let message = Message::Hello;
+    let mut message = Message::Hello;
     let mut serialized_message = serde_json::to_string(&message).unwrap();
-    let result1 = service.send_message(&serialized_message);
-    println!("1. {:?}", result1);
+    let result_from_hello = service.send_message(&serialized_message);
+    println!("1. {:?}", result_from_hello);
 
     let subscribe : Subscribe = Subscribe { name: "free_potato".to_string() };
     serialized_message = serde_json::to_string(&Message::Subscribe(subscribe)).unwrap();
-    let result2 = service.send_message(&serialized_message);
-    println!("2. {:?}", result2);
+    let result_from_subscribe = service.send_message(&serialized_message);
+
+    message = MessageParser::from_string(&result_from_subscribe);
+    let subscription_result : SubscribeResult = match message {
+        Message::SubscribeResult(subscribe_result) => subscribe_result,
+        _ => panic!("expected SubscribeResult")
+    };
+    match subscription_result {
+        SubscribeResult::Ok => println!("2. Ok"),
+        SubscribeResult::Err(err) => println!("2. Err: {}", err)
+    }
 }

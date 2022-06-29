@@ -4,7 +4,8 @@ use serde::{Serialize, Deserialize};
 pub enum Message {
     Hello,
     Welcome(Welcome),
-    Subscribe(Subscribe)
+    Subscribe(Subscribe),
+    SubscribeResult(SubscribeResult),
 }
 
 pub struct MessageParser {
@@ -32,8 +33,9 @@ pub struct Subscribe {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct SubscribeResult {
-
+pub enum SubscribeResult {
+    Ok,
+    Err(String),
 }
 
 // #[derive(Debug, Serialize, Deserialize)]
