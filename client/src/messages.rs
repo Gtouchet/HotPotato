@@ -6,6 +6,11 @@ pub enum Message {
     Welcome(Welcome),
     Subscribe(Subscribe),
     SubscribeResult(SubscribeResult),
+    PublicLeaderBoard(PublicLeaderBoard),
+    Challenge(Challenge),
+    ChallengeResult(ChallengeResult),
+    RoundSummary(RoundSummary),
+    EndOfGame(EndOfGame),
 }
 
 pub struct MessageParser {
@@ -38,7 +43,70 @@ pub enum SubscribeResult {
     Err(String),
 }
 
-// #[derive(Debug, Serialize, Deserialize)]
-// struct PublicLeaderBoard {
-//     leaderboard: Vec<PublicPlayer>
-// }
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PublicLeaderBoard {
+    leaderboard: Vec<PublicPlayer>
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PublicPlayer {
+    pub name: String,
+    pub stream_id: String,    
+    pub score: i32,
+    pub steps: u32,
+    pub is_active: bool,
+    pub total_used_time: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum Challenge {
+    RecoverSecret(RecoverSecretInput),
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RecoverSecretInput {
+    pub word_count: usize,
+    pub letters: String,
+    pub tuple_sizes: Vec<usize>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ChallengeResult {
+    pub result: ChallengeAnswer,
+    pub next_target: String
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum ChallengeValue {
+    Unreachable,
+    Timeout,
+    BadResult { used_time: f64, next_target: String },
+    Ok { used_time: f64, next_target: String }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum ChallengeAnswer {
+    RecoverSecret(RecoverSecretOutput)
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RecoverSecretOutput {
+    pub secret_sentence: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RoundSummary {
+    pub challenge: String,
+    pub chain: Vec<ReportedChallengeResult>
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ReportedChallengeResult {
+    pub name: String,
+    pub value: ChallengeValue
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct EndOfGame {
+    pub leader_board: PublicLeaderBoard
+}
