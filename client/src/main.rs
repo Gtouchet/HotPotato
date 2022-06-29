@@ -1,10 +1,11 @@
 mod responses;
+mod messages;
 
 use std::io::{self, Read, Write};
 use std::net::TcpStream;
 use serde_json;
 use serde::{Serialize, Deserialize};
-use crate::responses::Welcome;
+use crate::messages::{Message, Welcome };
 
 fn main() {
     let stream = match TcpStream::connect("localhost:7878") {
@@ -16,12 +17,15 @@ fn main() {
     };
     let mut service = Service { stream };
 
-    let result1 = service.send_message(r#""Hello""#);
+    let message = Message::Hello;
+    let mut serialized_message = serde_json::to_string(&message).unwrap();
+    let result1 = service.send_message(&serialized_message);
     println!("resp 1. {}", result1);
     let welcome: Welcome = serde_json::from_str(&result1).unwrap();
     println!("welcome: {:?}", welcome);
 
-    let result2 = service.send_message(r#"{"Subscribe":{"name":"free_patato"}}"#);
+    serialized_message = serde_json::to_string(&Message::Welcome(welcome)).unwrap();
+    let result2 = service.send_message(&serialized_message);
     println!("resp 2. {}", result2);
 }
 
