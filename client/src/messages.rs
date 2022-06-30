@@ -45,7 +45,7 @@ pub enum SubscribeResult {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PublicLeaderBoard {
-    leaderboard: Vec<PublicPlayer>
+    pub leaderboard: Vec<PublicPlayer>
 }
 
 #[derive(Debug, Serialize, Deserialize)]

@@ -26,4 +26,18 @@ impl Service
 
         Ok(response_as_string)
     }
+
+    pub(crate) fn listen_to_server_message(&mut self) -> Result<String, Error>
+    {
+        let mut buffer: &mut[u8] = &mut [0; 4];
+        self.stream.read_exact(&mut buffer)?;
+        let response_message_size = u32::from_be_bytes(buffer.try_into().unwrap());
+
+        let mut response_buffer = vec![0; response_message_size as usize];
+        self.stream.read_exact(&mut response_buffer)?;
+
+        let response_as_string = String::from_utf8(response_buffer.try_into().unwrap()).unwrap();
+
+        Ok(response_as_string)
+    }
 }

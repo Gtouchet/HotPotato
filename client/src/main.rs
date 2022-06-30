@@ -2,9 +2,10 @@ mod responses;
 mod messages;
 mod service;
 
-use std::io::{Read, Write};
+use std::borrow::Borrow;
 use std::net::TcpStream;
 use serde_json;
+use crate::Message::EndOfGame;
 use crate::messages::*;
 use crate::service::*;
 
@@ -42,6 +43,15 @@ fn main()
     };
     match subscription_result {
         SubscribeResult::Ok => println!("2. Ok"),
-        SubscribeResult::Err(err) => println!("2. Err: {}", err)
+        SubscribeResult::Err(err) => {
+            println!("2. Err: {}", err);
+            return
+        }
+    }
+
+    loop {
+        let mut message_from_server = service.listen_to_server_message().unwrap();
+        println!("loop. {}", message_from_server);
+        let parsed_message = MessageParser::from_string(&message_from_server);
     }
 }
