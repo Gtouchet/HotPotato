@@ -55,31 +55,10 @@ fn main()
 
 fn connect_to_server(address : &str) -> TcpStream
 {
-    let challenge_answer : ChallengeAnswer= match challenge {
-        Challenge::RecoverSecret(_input) => {
-            let recover_secret_result = ChallengeAnswer::RecoverSecret(RecoverSecretOutput {
-                secret_sentence: "".to_string()
-            }) ;
-            recover_secret_result           
     match TcpStream::connect(address) {
         Ok(stream) => stream,
         Err(err) => {
             panic!("Could not connect to the server: {}", err);
         }
-        Challenge::MD5HashCash(_input) => {
-            let md5_result = ChallengeAnswer::MD5HashCash(MD5HashCashOutput {
-                seed: 1,
-                hashcode: "".to_string(),
-            }) ;
-            md5_result
-        }
-    };
-    let challenge_result = ChallengeResult {
-        next_target: players_list[random.get_number(0, players_list.len() - 1)].to_string(),
-        result: challenge_answer
-    };
-
-    let serialized_message = serde_json::to_string(&Message::ChallengeResult(challenge_result)).unwrap();
-    service.send_message(&serialized_message).unwrap();
     }
 }
