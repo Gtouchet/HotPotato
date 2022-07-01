@@ -1,4 +1,6 @@
-trait Challenge {
+use crate::messages::{RecoverSecretInput, RecoverSecretOutput};
+
+pub(crate) trait Challenge {
     /// Données en entrée du challenge
     type Input;
     /// Données en sortie du challenge
@@ -13,17 +15,7 @@ trait Challenge {
     fn verify(&self, answer: &Self::Output) -> bool;
 }
 
-pub struct RecoverSecretInput {
-    pub word_count: usize,
-    pub letters: String,
-    pub tuple_sizes: Vec<usize>,
-}
-
-pub struct RecoverSecretOutput {
-    pub secret_sentence: String,
-}
-
-struct RecoverSecret {
+pub struct RecoverSecret {
     input: RecoverSecretInput
 }
 

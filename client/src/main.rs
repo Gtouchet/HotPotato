@@ -2,6 +2,7 @@ mod messages;
 mod client;
 mod random;
 mod service;
+mod recoversecret;
 
 use std::net::TcpStream;
 use crate::client::Client;

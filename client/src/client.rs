@@ -1,6 +1,7 @@
 use std::io::Error;
-use crate::{Message, Random, Service};
+use crate::{Message, Random, Service, recoversecret};
 use crate::messages::{Challenge, ChallengeAnswer, ChallengeResult, PublicPlayer, RecoverSecretOutput, MD5HashCashOutput, RoundSummary, Subscribe};
+use crate::recoversecret::{*, Challenge as ChallengeTrait};
 
 pub struct Client
 {
@@ -27,18 +28,15 @@ impl Client
     pub(crate) fn handle_challenge(&mut self, challenge: Challenge, players_list: Vec<&String>)
     {
         let challenge_answer : ChallengeAnswer = match challenge {
-            Challenge::RecoverSecret(_input) => {
-                let recover_secret_result = ChallengeAnswer::RecoverSecret(RecoverSecretOutput {
-                    secret_sentence: "".to_string()
-                }) ;
-                recover_secret_result           
+            Challenge::RecoverSecret(input) => {
+                let recover_secret: RecoverSecret = recoversecret::Challenge::new(input);
+                ChallengeAnswer::RecoverSecret(recover_secret.solve())     
             }
-            Challenge::MD5HashCash(_input) => {
-                let md5_result = ChallengeAnswer::MD5HashCash(MD5HashCashOutput {
+            Challenge::MD5HashCash(input) => {
+                ChallengeAnswer::MD5HashCash(MD5HashCashOutput {
                     seed: 1,
                     hashcode: "".to_string(),
-                }) ;
-                md5_result
+                })
             }
         };
         let challenge_result = ChallengeResult {
@@ -47,8 +45,7 @@ impl Client
         };
     
         let serialized_message = serde_json::to_string(&Message::ChallengeResult(challenge_result)).unwrap();
-        self.service.send_message(&serialized_message).unwrap();
-        
+        self.service.send_message(&serialized_message).unwrap();        
     }
 
     pub(crate) fn listen_to_server_message(&mut self) -> Result<String, Error>
