@@ -60,7 +60,13 @@ pub struct PublicPlayer {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Challenge {
+    MD5HashCash(MD5HashCashInput),
     RecoverSecret(RecoverSecretInput),
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct MD5HashCashInput {
+
 }
 
 #[derive(Debug, Serialize, Deserialize)]
