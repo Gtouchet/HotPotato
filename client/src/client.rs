@@ -1,6 +1,6 @@
 use std::io::Error;
 use crate::{Message, Random, Service};
-use crate::messages::{Challenge, ChallengeAnswer, ChallengeResult, PublicPlayer, RecoverSecretOutput, RoundSummary, Subscribe};
+use crate::messages::{Challenge, ChallengeAnswer, ChallengeResult, PublicPlayer, RecoverSecretOutput, MD5HashCashOutput, RoundSummary, Subscribe};
 
 pub struct Client
 {
@@ -26,25 +26,29 @@ impl Client
 
     pub(crate) fn handle_challenge(&mut self, challenge: Challenge, players_list: Vec<&String>)
     {
-        match challenge {
+        let challenge_answer : ChallengeAnswer = match challenge {
             Challenge::RecoverSecret(_input) => {
                 let recover_secret_result = ChallengeAnswer::RecoverSecret(RecoverSecretOutput {
                     secret_sentence: "".to_string()
-                });
-
-                let challenge_result = ChallengeResult {
-                    next_target: players_list[self.random.get_number(0, players_list.len() - 1)].to_string(),
-                    result: recover_secret_result
-                };
-
-                let serialized_message = serde_json::to_string(&Message::ChallengeResult(challenge_result)).unwrap();
-                self.service.send_message(&serialized_message).unwrap();
+                }) ;
+                recover_secret_result           
             }
-
             Challenge::MD5HashCash(_input) => {
-                // TODO
+                let md5_result = ChallengeAnswer::MD5HashCash(MD5HashCashOutput {
+                    seed: 1,
+                    hashcode: "".to_string(),
+                }) ;
+                md5_result
             }
-        }
+        };
+        let challenge_result = ChallengeResult {
+            next_target: players_list[self.random.get_number(0, players_list.len() - 1)].to_string(),
+            result: challenge_answer
+        };
+    
+        let serialized_message = serde_json::to_string(&Message::ChallengeResult(challenge_result)).unwrap();
+        self.service.send_message(&serialized_message).unwrap();
+        
     }
 
     pub(crate) fn listen_to_server_message(&mut self) -> Result<String, Error>
