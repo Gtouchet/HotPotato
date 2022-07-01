@@ -1,6 +1,7 @@
 mod messages;
 mod service;
 mod random;
+mod recoversecret;
 
 use std::net::TcpStream;
 use serde_json;
