@@ -25,9 +25,10 @@ fn main()
 
     let _ = client.subscribe(); // TODO: match
 
+    let mut players_list = Vec::new();
+
     loop
     {
-        let mut players_list = Vec::new();
 
         let message_from_server = client.listen_to_server_message().unwrap();
 
@@ -40,11 +41,13 @@ fn main()
                 client.display_round_summary(round_summary);
             }
             Message::Challenge(challenge) => {
-                client.handle_challenge(challenge, players_list);
+                client.handle_challenge(challenge, &players_list);
             }
             Message::PublicLeaderBoard(players) => {
+                players_list = Vec::new();
+
                 players.iter().for_each(|p| players_list.push(&p.name));
-                client.display_leaderboard(players);
+                client.display_leaderboard(&players);
             }
             _ => {
                 println!("Error: unexpected message wtf I quit bye");
