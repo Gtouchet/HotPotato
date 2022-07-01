@@ -45,7 +45,7 @@ pub enum SubscribeResult {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PublicLeaderBoard {
-    pub leaderboard: Vec<PublicPlayer>
+    pub leader_board: Vec<PublicPlayer>
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -87,7 +87,7 @@ pub struct RecoverSecretInput {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChallengeResult {
-    pub result: ChallengeAnswer,
+    pub answer: ChallengeAnswer,
     pub next_target: String
 }
 
