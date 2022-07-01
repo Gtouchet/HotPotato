@@ -25,7 +25,7 @@ impl Client
         self.service.send_message(&serialized_message)
     }
 
-    pub(crate) fn handle_challenge(&mut self, challenge: Challenge, players_list: &Vec<&String>)
+    pub(crate) fn handle_challenge(&mut self, challenge: Challenge, players_list: &Vec<String>)
     {
         let challenge_answer : ChallengeAnswer = match challenge {
             Challenge::RecoverSecret(input) => {
