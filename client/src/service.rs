@@ -1,6 +1,5 @@
 use std::net::TcpStream;
 use std::io::{Error, Read, Write};
-use std::string::FromUtf8Error;
 
 pub struct Service
 {

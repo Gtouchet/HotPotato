@@ -1,11 +1,8 @@
-mod responses;
 mod messages;
 mod service;
 
-use std::borrow::Borrow;
 use std::net::TcpStream;
 use serde_json;
-use crate::Message::EndOfGame;
 use crate::messages::*;
 use crate::service::*;
 
@@ -32,7 +29,7 @@ fn main()
     let result1 = service.send_message(&serialized_message);
     println!("1. {:?}", result1);
 
-    let subscribe: Subscribe = Subscribe { name: "free_potato".to_string() };
+    let subscribe: Subscribe = Subscribe { name: "free_pozzzotato".to_string() };
     serialized_message = serde_json::to_string(&Message::Subscribe(subscribe)).unwrap();
     let result_from_subscribe = service.send_message(&serialized_message);
 
@@ -52,6 +49,26 @@ fn main()
     loop {
         let mut message_from_server = service.listen_to_server_message().unwrap();
         println!("loop. {}", message_from_server);
+        
         let parsed_message = MessageParser::from_string(&message_from_server);
+        match parsed_message {
+            Message::EndOfGame(end_of_game) => {
+                println!("3. end_of_game {:?}", end_of_game);
+                break;
+            }
+            Message::RoundSummary(round_summary) => {
+                println!("3. round_summary {:?}", round_summary);
+            }
+            Message::Challenge(challenge) => {
+                println!("3. challenge {:?}", challenge);
+            }
+            Message::PublicLeaderBoard(players) => {
+                println!("3. players {:?}", players);
+            }
+            _ => {
+                println!("3. unexpected message");
+                return;
+            }
+        }
     }
 }
