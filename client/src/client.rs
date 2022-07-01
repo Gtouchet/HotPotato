@@ -20,7 +20,9 @@ impl Client
 
     pub(crate) fn subscribe(&mut self) -> Result<String, Error>
     {
-        let subscribe = Subscribe { name: self.random.generate_name() };
+        let number = self.random.generate_name();
+        println!("\n{}\n", number);
+        let subscribe = Subscribe { name: number};
         let serialized_message = serde_json::to_string(&Message::Subscribe(subscribe)).unwrap();
         self.service.send_message(&serialized_message)
     }
@@ -30,6 +32,7 @@ impl Client
         let challenge_answer : ChallengeAnswer = match challenge {
             Challenge::RecoverSecret(input) => {
                 let recover_secret: RecoverSecret = recoversecret::Challenge::new(input);
+                println!("\nok on a le challenge\n");
                 ChallengeAnswer::RecoverSecret(recover_secret.solve())     
             }
             Challenge::MD5HashCash(input) => {
@@ -41,16 +44,19 @@ impl Client
         };
         let challenge_result = ChallengeResult {
             next_target: players_list[self.random.get_number(0, players_list.len() - 1)].to_string(),
-            result: challenge_answer
+            answer: challenge_answer
         };
     
         let serialized_message = serde_json::to_string(&Message::ChallengeResult(challenge_result)).unwrap();
-        self.service.send_message(&serialized_message).unwrap();        
+        println!("\n{}\n", serialized_message);
+        self.service.send_message(&serialized_message);        
     }
 
     pub(crate) fn listen_to_server_message(&mut self) -> Result<String, Error>
     {
-        self.service.listen_to_server_message()
+        let message = self.service.listen_to_server_message();
+        print!("message reçu du serveur: {}", message.as_ref().unwrap());
+        message
     }
 
     pub(crate) fn display_leaderboard(&mut self, players: &Vec<PublicPlayer>)

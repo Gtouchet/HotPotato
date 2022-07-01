@@ -29,7 +29,13 @@ fn main()
 
     loop
     {
-        let message_from_server = client.listen_to_server_message().unwrap();
+        let message_from_server = match client.listen_to_server_message() {
+            Ok(message) => message,
+            Err(error) => {
+                println!("Error: could not listen to server message {}", error);
+                break;
+            }
+        };       
 
         match MessageParser::from_string(&message_from_server) {
             Message::EndOfGame(end_of_game) => {
