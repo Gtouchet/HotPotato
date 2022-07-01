@@ -1,9 +1,11 @@
 mod messages;
 mod service;
+mod random;
 
 use std::net::TcpStream;
 use serde_json;
 use crate::messages::*;
+use crate::random::Random;
 use crate::service::*;
 
 fn main()
@@ -21,7 +23,8 @@ fn main()
     let result1 = service.send_message(&serialized_message);
     println!("1. {:?}", result1);
 
-    let subscribe: Subscribe = Subscribe { name: "free_potato".to_string() };
+    let mut random = Random { random: rand::thread_rng() };
+    let subscribe: Subscribe = Subscribe { name: random.generate_name() };
     serialized_message = serde_json::to_string(&Message::Subscribe(subscribe)).unwrap();
     let result_from_subscribe = service.send_message(&serialized_message);
 
