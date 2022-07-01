@@ -11,10 +11,12 @@ use crate::service::*;
 
 fn main()
 {
-    let mut service = Service { stream : connect_to_server("localhost:7878")};        
+    let mut service = Service { stream : connect_to_server("localhost:7878")};
+    let mut random = Random { random: rand::thread_rng() };
+
     say_hello(&mut service);
-    subscribe(&mut service);
-    play(&mut service);    
+    subscribe(&mut service, &mut random);
+    play(&mut service, &mut random);
 }
 
 fn connect_to_server(address : &str) -> TcpStream
@@ -27,7 +29,8 @@ fn connect_to_server(address : &str) -> TcpStream
     }
 }
 
-fn say_hello(service: &mut Service) {
+fn say_hello(service: &mut Service)
+{
     let message = Message::Hello;
     let serialized_message = match serde_json::to_string(&message) {
         Ok(m) => m,
@@ -40,8 +43,8 @@ fn say_hello(service: &mut Service) {
     println!("1. {:?}", result1);
 }
 
-fn subscribe(service: &mut Service) {
-    let mut random = Random { random: rand::thread_rng() };
+fn subscribe(service: &mut Service, random: &mut Random)
+{
     let subscribe: Subscribe = Subscribe { name: random.generate_name() };
     let serialized_message = serde_json::to_string(&Message::Subscribe(subscribe)).unwrap();
     let result_from_subscribe = service.send_message(&serialized_message);
@@ -60,50 +63,77 @@ fn subscribe(service: &mut Service) {
     }
 }
 
-fn play(service : &mut Service) {
-    loop {
+fn play(service: &mut Service, random: &mut Random)
+{
+    loop
+    {
+        let mut players_list = Vec::new();
+
         let message_from_server = service.listen_to_server_message().unwrap();
-        println!("loop. {}", message_from_server);
-        
-        let parsed_message = MessageParser::from_string(&message_from_server);
-        match parsed_message {
+
+        match MessageParser::from_string(&message_from_server) {
             Message::EndOfGame(end_of_game) => {
-                println!("3. end_of_game {:?}", end_of_game);
+                println!("END OF GAME -- {:?}", end_of_game);
                 break;
             }
             Message::RoundSummary(round_summary) => {
-                println!("3. round_summary {:?}", round_summary);
+                display_round_summary(round_summary);
             }
             Message::Challenge(challenge) => {
-                println!("3. challenge {:?}", challenge);
-
-                match challenge {
-                    Challenge::RecoverSecret(input) => {
-                        let recover_secret_result = ChallengeAnswer::RecoverSecret(RecoverSecretOutput {
-                            secret_sentence: "".to_string()
-                        });
-                        let next_target : String = "dark_salad".to_string();
-                        let challenge_result = ChallengeResult {
-                            next_target: next_target,
-                            result: recover_secret_result
-                        };
-                        let serialized_message = serde_json::to_string(&Message::ChallengeResult(challenge_result)).unwrap();
-                        service.send_message(&serialized_message).unwrap();
-                    }
-                    Challenge::MD5HashCash(input) => {
-
-                    }
-                }
-
-
+                handle_challenge(service, challenge, players_list, random);
             }
             Message::PublicLeaderBoard(players) => {
-                println!("3. players {:?}", players);
+                players.iter().for_each(|p| players_list.push(&p.name));
+                display_leaderboard(players);
             }
             _ => {
-                println!("3. unexpected message");
+                println!("Error: unexpected message wtf I quit");
                 return;
             }
         }
     }
+}
+
+fn handle_challenge(service: &mut Service, challenge: Challenge, players_list: Vec<&String>, random: &mut Random)
+{
+    match challenge {
+        Challenge::RecoverSecret(_input) => {
+            let recover_secret_result = ChallengeAnswer::RecoverSecret(RecoverSecretOutput {
+                secret_sentence: "".to_string()
+            });
+
+            let challenge_result = ChallengeResult {
+                next_target: players_list[random.get_number(0, players_list.len() - 1)].to_string(),
+                result: recover_secret_result
+            };
+
+            let serialized_message = serde_json::to_string(&Message::ChallengeResult(challenge_result)).unwrap();
+            service.send_message(&serialized_message).unwrap();
+        }
+
+        Challenge::MD5HashCash(_input) => {
+            // TODO
+        }
+    }
+}
+
+fn display_leaderboard(players: Vec<PublicPlayer>)
+{
+    println!("----- Leaderboard -----\n");
+    players.iter()
+        .for_each(|p| println!(
+            "Player {}:\n\
+            - Score: {}\n\
+            - Steps: {}\n\
+            - Active: {}\n\
+            - Used time: {}\n",
+            p.name, p.score, p.steps, p.is_active, p.total_used_time)
+        )
+}
+
+fn display_round_summary(round_summary: RoundSummary)
+{
+    // TODO
+    println!("----- Round summary -----\n");
+    println!("{:?}", round_summary);
 }
