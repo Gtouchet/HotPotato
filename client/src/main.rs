@@ -75,6 +75,26 @@ fn play(service : &mut Service) {
             }
             Message::Challenge(challenge) => {
                 println!("3. challenge {:?}", challenge);
+
+                match challenge {
+                    Challenge::RecoverSecret(input) => {
+                        let recover_secret_result = ChallengeAnswer::RecoverSecret(RecoverSecretOutput {
+                            secret_sentence: "".to_string()
+                        });
+                        let next_target : String = "dark_salad".to_string();
+                        let challenge_result = ChallengeResult {
+                            next_target: next_target,
+                            result: recover_secret_result
+                        };
+                        let serialized_message = serde_json::to_string(&Message::ChallengeResult(challenge_result)).unwrap();
+                        service.send_message(&serialized_message).unwrap();
+                    }
+                    Challenge::MD5HashCash(input) => {
+
+                    }
+                }
+
+
             }
             Message::PublicLeaderBoard(players) => {
                 println!("3. players {:?}", players);
