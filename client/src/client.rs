@@ -32,7 +32,6 @@ impl Client
         let challenge_answer : ChallengeAnswer = match challenge {
             Challenge::RecoverSecret(input) => {
                 let recover_secret: RecoverSecret = recoversecret::Challenge::new(input);
-                println!("\nok on a le challenge\n");
                 ChallengeAnswer::RecoverSecret(recover_secret.solve())     
             }
             Challenge::MD5HashCash(input) => {
@@ -43,6 +42,7 @@ impl Client
             }
         };
         let challenge_result = ChallengeResult {
+            //TODO rework this
             next_target: players_list[self.random.get_number(0, players_list.len() - 1)].to_string(),
             answer: challenge_answer
         };

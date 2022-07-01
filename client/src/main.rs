@@ -39,6 +39,7 @@ fn main()
 
         match MessageParser::from_string(&message_from_server) {
             Message::EndOfGame(end_of_game) => {
+                //TODO: handle end of game
                 println!("END OF GAME -- {:?}", end_of_game);
                 break;
             }
