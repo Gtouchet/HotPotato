@@ -66,7 +66,16 @@ pub enum Challenge {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MD5HashCashInput {
+    pub complexitity: u32,
+    pub message: String,
+}
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct MD5HashCashOutput {
+    // Seed used to solve the challenge
+    pub seed: u64,
+    // hashcode found using seed + message
+    pub hashcode: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -92,6 +101,7 @@ pub enum ChallengeValue {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum ChallengeAnswer {
+    MD5HashCash(MD5HashCashOutput),
     RecoverSecret(RecoverSecretOutput)
 }
 
