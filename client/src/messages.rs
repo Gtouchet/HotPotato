@@ -17,7 +17,7 @@ pub struct MessageParser {
 }
 
 impl MessageParser {
-    pub fn from_string(string_to_parse: &str) -> Message {
+    pub(crate) fn from_string(string_to_parse: &str) -> Message {
         let response: Result<Message, serde_json::Error> = serde_json::from_str(&string_to_parse);
         let message: Message = match response {
             Ok(m) => m,
