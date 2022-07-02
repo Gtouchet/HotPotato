@@ -42,29 +42,34 @@ impl Challenge for RecoverSecret {
     fn solve(&self) -> Self::Output
     {
         let mut secret_sentence = String::new();
-        let mut last_index = 0;
+        let mut have_changed = true;
 
-        for tuple_size in &self.input.tuple_sizes
-        {
-            for index in last_index..(*tuple_size + last_index)
+        while have_changed {
+            let mut last_index = 0;
+            have_changed = false;
+
+            for tuple_size in &self.input.tuple_sizes
             {
-                let char = &self.input.letters[index..=index];
-
-                if !secret_sentence.contains(char) {
-                    secret_sentence.push_str(char);
-                }
-                else if index != last_index
+                for index in last_index..(*tuple_size + last_index)
                 {
-                    let first_index = secret_sentence.rfind(char).unwrap();
-                    let second_index = secret_sentence.rfind(&self.input.letters[index-1..=index-1]).unwrap();
+                    let char = &self.input.letters[index..=index];
 
-                    if first_index < second_index
+                    if !secret_sentence.contains(char) {
+                        secret_sentence.push_str(char);
+                    } else if index != last_index
                     {
-                        secret_sentence = RecoverSecret::swap(&secret_sentence, first_index, second_index);
+                        let first_index = secret_sentence.rfind(char).unwrap();
+                        let second_index = secret_sentence.rfind(&self.input.letters[index - 1..=index - 1]).unwrap();
+
+                        if first_index < second_index
+                        {
+                            secret_sentence = RecoverSecret::swap(&secret_sentence, first_index, second_index);
+                            have_changed = true;
+                        }
                     }
                 }
+                last_index += *tuple_size;
             }
-            last_index += *tuple_size;
         }
         RecoverSecretOutput { secret_sentence }
     }
