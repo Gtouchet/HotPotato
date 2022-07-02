@@ -124,5 +124,5 @@ pub struct ReportedChallengeResult {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EndOfGame {
-    pub leader_board: PublicLeaderBoard
+    pub leader_board: Vec<PublicPlayer>
 }
