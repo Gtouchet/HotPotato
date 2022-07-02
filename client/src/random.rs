@@ -15,6 +15,6 @@ impl Random
 
     pub(crate) fn get_number(&mut self, min: usize, max: usize) -> usize
     {
-        self.random.gen_range(min..max)
+        self.random.gen_range(min..=max)
     }
 }
