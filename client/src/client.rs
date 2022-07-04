@@ -1,6 +1,5 @@
-use std::io::Error;
 use crate::{Message, Random, Service, recoversecret};
-use crate::messages::{Challenge, ChallengeAnswer, ChallengeResult, PublicPlayer, RecoverSecretOutput, MD5HashCashOutput, RoundSummary, Subscribe};
+use crate::messages::{Challenge, ChallengeAnswer, ChallengeResult, PublicPlayer, MD5HashCashOutput, RoundSummary, Subscribe};
 use crate::recoversecret::{*, Challenge as ChallengeTrait};
 
 pub struct Client
@@ -47,7 +46,6 @@ impl Client
         };
     
         let serialized_message = serde_json::to_string(&Message::ChallengeResult(challenge_result)).unwrap();
-        println!("\n{}\n", serialized_message);
 
         self.service.send_message(&serialized_message);
     }
@@ -75,7 +73,7 @@ impl Client
     {
         // TODO
         println!("----- Round summary -----\n");
-        println!("{:?}", round_summary);
+        //println!("{:?}", round_summary);
     }
 }
 

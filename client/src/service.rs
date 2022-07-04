@@ -1,5 +1,5 @@
 use std::net::TcpStream;
-use std::io::{Error, ErrorKind, Read, Write};
+use std::io::{Read, Write};
 
 pub struct Service
 {
@@ -16,7 +16,7 @@ impl Service
             Err(err) => panic!("Error: could not write client message size\n{}", err),
         };
         match self.stream.write_all(message.as_bytes()) {
-            Ok(ok) => {},
+            Ok(_) => {},
             Err(err) => panic!("Error: could not write client message\n{}", err),
         };
     }

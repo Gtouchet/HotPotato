@@ -24,7 +24,6 @@ fn main()
     client.say_hello();
     let response = client.subscribe();
     println!("\nclient name: {}", response.0);
-    println!("server response: {}\n", response.1);
 
     let mut players_list : Vec<String> = Vec::new();
 
