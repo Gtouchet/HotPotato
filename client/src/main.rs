@@ -40,7 +40,8 @@ fn main()
 
     client.say_hello();
     let response = client.subscribe();
-    println!("\nclient name: {}", response.0);
+    let client_name = response.0;
+    println!("\nclient name: {}", &client_name);
 
     let mut players_list : Vec<String> = Vec::new();
 
@@ -58,7 +59,7 @@ fn main()
                 client.display_round_summary(round_summary);
             }
             Message::Challenge(challenge) => {
-                client.handle_challenge(challenge, &players_list);
+                client.handle_challenge(challenge, &mut players_list, &client_name);
             }
             Message::PublicLeaderBoard(players) => {                
                 players_list = Vec::new();

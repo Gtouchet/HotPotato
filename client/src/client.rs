@@ -25,7 +25,7 @@ impl Client
         return (client_name, self.service.send_message_and_listen_to_response(&serialized_message));
     }
 
-    pub(crate) fn handle_challenge(&mut self, challenge: Challenge, players_list: &Vec<String>)
+    pub(crate) fn handle_challenge(&mut self, challenge: Challenge, players_list: &mut Vec<String>, client_name: &String)
     {
         let challenge_answer : ChallengeAnswer = match challenge {
             Challenge::RecoverSecret(input) => {
@@ -39,6 +39,9 @@ impl Client
                 })
             }
         };
+        if let Some(index) = players_list.iter().position(|value| value == client_name) {
+            players_list.remove(index);
+        }
         let challenge_result = ChallengeResult {
             //TODO rework this
             next_target: players_list[self.random.get_number(0, players_list.len() - 1)].to_string(),
