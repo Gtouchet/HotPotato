@@ -5,6 +5,7 @@ mod service;
 mod recoversecret;
 
 use std::net::TcpStream;
+use clap::{Arg, App};
 use crate::client::Client;
 use crate::messages::{Message, MessageParser};
 use crate::random::Random;
@@ -12,9 +13,25 @@ use crate::service::Service;
 
 fn main()
 {
+    //parse CLI arguments to get server address
+    let matches = App::new("HotPotato client")
+        .version("v1.0.0")
+        .author("the best")
+        .about("HotPotato client to play against other clients")
+        .arg(Arg::new("address")
+            .short('a')
+            .long("address")
+            .value_name("ADDRESS")
+            .default_value("localhost:7878")
+            .help("Address of the server to connect"))
+        .get_matches();
+
+    let address = matches.value_of("address").unwrap();
+    println!("Connecting to {}", &address);
+
     let mut client = Client {
         service: Service {
-            stream: connect_to_server("localhost:7878"),
+            stream: connect_to_server(address),
         },
         random: Random {
             random: rand::thread_rng(),
