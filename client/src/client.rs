@@ -14,16 +14,16 @@ impl Client
     pub(crate) fn say_hello(&mut self)
     {
         let serialized_message = serde_json::to_string(&Message::Hello).unwrap();
-        self.service.send_message(&serialized_message);
+        self.service.send_message_and_listen_to_response(&serialized_message);
     }
 
-    pub(crate) fn subscribe(&mut self) -> (&String, String)
+    pub(crate) fn subscribe(&mut self) -> (String, String)
     {
         let client_name = self.random.generate_name();
         let serialized_message = serde_json::to_string(&Message::Subscribe(Subscribe {
-            name: client_name,
+            name: client_name.clone(),
         })).unwrap();
-        return (&client_name, self.service.send_message_and_listen_to_response(&serialized_message));
+        return (client_name, self.service.send_message_and_listen_to_response(&serialized_message));
     }
 
     pub(crate) fn handle_challenge(&mut self, challenge: Challenge, players_list: &Vec<String>)
@@ -52,7 +52,7 @@ impl Client
         self.service.send_message(&serialized_message);
     }
 
-    pub(crate) fn listen_to_server_message(&mut self) -> String
+    pub(crate) fn listen_to_response(&mut self) -> String
     {
         return self.service.listen_to_response();
     }

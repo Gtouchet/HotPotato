@@ -22,23 +22,15 @@ fn main()
     };
 
     client.say_hello();
-
-    match client.subscribe() {
-        Ok(_) => {},
-        Err(err) => panic!("subscription error : {}", err),
-    };
+    let response = client.subscribe();
+    println!("\nclient name: {}", response.0);
+    println!("server response: {}\n", response.1);
 
     let mut players_list : Vec<String> = Vec::new();
 
     loop
     {
-        let message_from_server = match client.listen_to_server_message() {
-            Ok(message) => message,
-            Err(error) => {
-                println!("Error: could not listen to server message {}", error);
-                break;
-            }
-        };       
+        let message_from_server = client.listen_to_response();
 
         match MessageParser::from_string(&message_from_server) {
             Message::EndOfGame(end_of_game) => {
