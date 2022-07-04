@@ -71,9 +71,8 @@ impl Client
 
     pub(crate) fn display_round_summary(&mut self, round_summary: RoundSummary)
     {
-        // TODO
         println!("----- Round summary -----\n");
-        //println!("{:?}", round_summary);
+        println!("round number: {}",round_summary.chain.len().to_string());
     }
 }
 
