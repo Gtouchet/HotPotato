@@ -23,7 +23,10 @@ fn main()
 
     client.say_hello();
 
-    let _ = client.subscribe(); // TODO: match
+    match client.subscribe() {
+        Ok(_) => {},
+        Err(err) => panic!("subscription error : {}", err),
+    };
 
     let mut players_list : Vec<String> = Vec::new();
 
