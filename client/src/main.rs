@@ -79,8 +79,6 @@ fn connect_to_server(address : &str) -> TcpStream
 {
     match TcpStream::connect(address) {
         Ok(stream) => stream,
-        Err(err) => {
-            panic!("Could not connect to the server: {}", err);
-        }
+        Err(err) => panic!("Could not connect to the server: {}", err),
     }
 }
