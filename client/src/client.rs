@@ -13,18 +13,17 @@ impl Client
 {
     pub(crate) fn say_hello(&mut self)
     {
-        let message = Message::Hello;
-        let serialized_message = serde_json::to_string(&message).unwrap();
-        let _ = self.service.send_message(&serialized_message);
+        let serialized_message = serde_json::to_string(&Message::Hello).unwrap();
+        self.service.send_message(&serialized_message);
     }
 
-    pub(crate) fn subscribe(&mut self) -> Result<String, Error>
+    pub(crate) fn subscribe(&mut self) -> (&String, String)
     {
-        let number = self.random.generate_name();
-        println!("\n{}\n", number);
-        let subscribe = Subscribe { name: number};
-        let serialized_message = serde_json::to_string(&Message::Subscribe(subscribe)).unwrap();
-        self.service.send_message(&serialized_message)
+        let client_name = self.random.generate_name();
+        let serialized_message = serde_json::to_string(&Message::Subscribe(Subscribe {
+            name: client_name,
+        })).unwrap();
+        return (&client_name, self.service.send_message_and_listen_to_response(&serialized_message));
     }
 
     pub(crate) fn handle_challenge(&mut self, challenge: Challenge, players_list: &Vec<String>)
@@ -34,7 +33,7 @@ impl Client
                 let recover_secret: RecoverSecret = recoversecret::Challenge::new(input);
                 ChallengeAnswer::RecoverSecret(recover_secret.solve())     
             }
-            Challenge::MD5HashCash(input) => {
+            Challenge::MD5HashCash(_) => {
                 ChallengeAnswer::MD5HashCash(MD5HashCashOutput {
                     seed: 1,
                     hashcode: "".to_string(),
@@ -49,14 +48,13 @@ impl Client
     
         let serialized_message = serde_json::to_string(&Message::ChallengeResult(challenge_result)).unwrap();
         println!("\n{}\n", serialized_message);
-        self.service.send_message(&serialized_message);        
+
+        self.service.send_message(&serialized_message);
     }
 
-    pub(crate) fn listen_to_server_message(&mut self) -> Result<String, Error>
+    pub(crate) fn listen_to_server_message(&mut self) -> String
     {
-        let message = self.service.listen_to_server_message();
-        print!("message reçu du serveur: {}", message.as_ref().unwrap());
-        message
+        return self.service.listen_to_response();
     }
 
     pub(crate) fn display_leaderboard(&mut self, players: &Vec<PublicPlayer>)
