@@ -102,6 +102,12 @@ pub struct RecoverSecretOutput {
 
 /// Contains the answer of a challenge and the next player to give the hot potato
 #[derive(Debug, Serialize, Deserialize)]
+pub struct Md5ResolverInput {
+    pub seed: String,
+    pub hashcode: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ChallengeResult {
     pub answer: ChallengeAnswer,
     pub next_target: String
@@ -124,6 +130,11 @@ pub enum ChallengeAnswer {
 }
 
 /// Contains the information of a round
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Md5ResolverOutput {
+    pub secret_sentence: String,
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RoundSummary {
     pub challenge: String,
