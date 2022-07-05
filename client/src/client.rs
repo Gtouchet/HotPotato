@@ -2,6 +2,25 @@ use crate::{Message, Random, Service, recoversecret};
 use crate::messages::{Challenge, ChallengeAnswer, ChallengeResult, PublicPlayer, MD5HashCashOutput, RoundSummary, Subscribe};
 use crate::recoversecret::{*, Challenge as ChallengeTrait};
 
+/// Client main function
+///
+/// # Arguments
+///
+/// * `service` - The service to connect and send messages to the server
+/// * `random` - A random number which is used to identify the client
+///
+/// # Example
+///
+/// ```rust
+/// let mut client = Client {
+///         service: Service {
+///         stream: connect_to_server("localhost:7878"),
+///     },
+///     random: Random {
+///         random: rand::thread_rng(),
+///     },
+/// };
+/// ```
 pub struct Client
 {
     pub service: Service,
@@ -10,12 +29,18 @@ pub struct Client
 
 impl Client
 {
+    /// Say hello to the server to start the conversation
     pub(crate) fn say_hello(&mut self)
     {
         let serialized_message = serde_json::to_string(&Message::Hello).unwrap();
         self.service.send_message_and_listen_to_response(&serialized_message);
     }
 
+    /// Subscribe to the server to get the next challenge
+    ///
+    /// # Return
+    ///
+    /// * `(String, String)` - The server response as a map
     pub(crate) fn subscribe(&mut self) -> (String, String)
     {
         let client_name = self.random.generate_name();
@@ -25,6 +50,24 @@ impl Client
         return (client_name, self.service.send_message_and_listen_to_response(&serialized_message));
     }
 
+    /// Take a challenge to solve it, send the solution and a player to give the hot potato
+    ///
+    /// # Arguments
+    ///
+    /// * `challenge` - An element from Challenge enum that contains the challenge information
+    /// * `players_list` - A list of game's players names
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// let message_from_server = client.listen_to_response();
+    ///
+    /// match MessageParser::from_string(&message_from_server) {
+    ///     Message::Challenge(challenge) => {
+    ///         client.handle_challenge(challenge, &players_list);
+    ///     }
+    /// }
+    /// ```
     pub(crate) fn handle_challenge(&mut self, challenge: Challenge, players_list: &mut Vec<String>, client_name: &String)
     {
         let challenge_answer : ChallengeAnswer = match challenge {
@@ -58,6 +101,23 @@ impl Client
         return self.service.listen_to_response();
     }
 
+    /// Display the player leaderboard thanks to the player list
+    ///
+    /// # Arguments
+    ///
+    /// * `players_list` - A list of game's players information
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// let message_from_server = client.listen_to_response();
+    ///
+    /// match MessageParser::from_string(&message_from_server) {
+    ///     Message::PublicLeaderBoard(players) => {
+    ///         client.display_leaderboard(&players);
+    ///     }
+    /// }
+    /// ```
     pub(crate) fn display_leaderboard(&mut self, players: &Vec<PublicPlayer>)
     {
         println!("----- Leaderboard -----\n");
