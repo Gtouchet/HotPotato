@@ -29,8 +29,8 @@ impl Challenge for Md5Resolver
             digest_string.push_str(&format!("{:x}", byte));
         }
         MD5HashCashOutput {
-            seed: get_seed(self.input.complexity),
             hashcode: digest_string,
+            seed: 0,
         }
     }
 
@@ -40,5 +40,30 @@ impl Challenge for Md5Resolver
 }
 
 fn get_seed(complexity: u32) -> u64 {
-    format!("{:x}", complexity).parse::<u64>().unwrap()
+    let mut seed = 0;
+    for _ in 0..complexity
+    {
+        seed = seed * 10 + rand::random::<u64>() % 10;
+    }
+    seed
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::md5_resolver::Md5Resolver;
+    use crate::messages::MD5HashCashInput;
+    use crate::recoversecret::Challenge;
+
+    #[test]
+    fn test() {
+        let input = MD5HashCashInput {
+            complexity: 9,
+            message: "Hello".to_string(),
+        };
+        let challenge = Md5Resolver::new(input);
+        let output = challenge.solve();
+
+        assert_eq!(output.hashcode, "00441745D9BDF8E5D3C7872AC9DBB2C3");
+        assert_eq!(output.seed.to_string(), "000000000000034C".to_string());
+    }
 }
