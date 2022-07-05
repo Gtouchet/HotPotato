@@ -1,15 +1,15 @@
-use crate::messages::{Md5ResolverInput, Md5ResolverOutput};
+use crate::messages::{MD5HashCashInput, MD5HashCashOutput};
 use crate::recoversecret::Challenge;
 
 pub struct Md5Resolver
 {
-    input: Md5ResolverInput
+    input: MD5HashCashInput
 }
 
 impl Challenge for Md5Resolver
 {
-    type Input = Md5ResolverInput;
-    type Output = Md5ResolverOutput;
+    type Input = MD5HashCashInput;
+    type Output = MD5HashCashOutput;
 
     fn name() -> String {
         "MD5HashCash".to_string()
@@ -22,11 +22,23 @@ impl Challenge for Md5Resolver
     }
 
     fn solve(&self) -> Self::Output {
-        let digest = md5::compute(b"abcdefghijklmnopqrstuvwxyz");
-        Md5ResolverOutput { secret_sentence: "".to_string() }
+        let digest = md5::compute(self.input.message.as_bytes());
+        let mut digest_string = String::new();
+        for byte in digest.iter()
+        {
+            digest_string.push_str(&format!("{:x}", byte));
+        }
+        MD5HashCashOutput {
+            seed: get_seed(self.input.complexity),
+            hashcode: digest_string,
+        }
     }
 
     fn verify(&self, answer: &Self::Output) -> bool {
         todo!()
     }
+}
+
+fn get_seed(complexity: u32) -> u64 {
+    format!("{:x}", complexity).parse::<u64>().unwrap()
 }

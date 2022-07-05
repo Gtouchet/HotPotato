@@ -66,7 +66,7 @@ pub enum Challenge {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MD5HashCashInput {
-    pub complexitity: u32,
+    pub complexity: u32,
     pub message: String,
 }
 
@@ -83,12 +83,6 @@ pub struct RecoverSecretInput {
     pub word_count: usize,
     pub letters: String,
     pub tuple_sizes: Vec<usize>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Md5ResolverInput {
-    pub seed: String,
-    pub hashcode: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -113,11 +107,6 @@ pub enum ChallengeAnswer {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RecoverSecretOutput {
-    pub secret_sentence: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Md5ResolverOutput {
     pub secret_sentence: String,
 }
 
