@@ -22,30 +22,33 @@ impl Challenge for Md5Resolver
     }
 
     fn solve(&self) -> Self::Output {
-        let digest = md5::compute(self.input.message.as_bytes());
-        let mut digest_string = String::new();
-        for byte in digest.iter()
-        {
-            digest_string.push_str(&format!("{:x}", byte));
+        let mut seed = 0;
+
+        let mut digest;
+        loop {
+            digest = md5::compute(format!("{:016X}{}", seed, self.input.message));
+
+            let string = format!("{:032X}", digest);
+            let as_int = u128::from_str_radix(&string, 16);
+
+            if as_int.unwrap().leading_zeros() >= self.input.complexity {
+                break;
+            }
+
+            seed += 1;
         }
+
+        let digest_str = format!("{:32X}", digest);
+
         MD5HashCashOutput {
-            hashcode: digest_string,
-            seed: 0,
+            seed,
+            hashcode: digest_str,
         }
     }
 
     fn verify(&self, answer: &Self::Output) -> bool {
         todo!()
     }
-}
-
-fn get_seed(complexity: u32) -> u64 {
-    let mut seed = 0;
-    for _ in 0..complexity
-    {
-        seed = seed * 10 + rand::random::<u64>() % 10;
-    }
-    seed
 }
 
 #[cfg(test)]
@@ -58,12 +61,12 @@ mod tests {
     fn test() {
         let input = MD5HashCashInput {
             complexity: 9,
-            message: "Hello".to_string(),
+            message: "hello".to_string(),
         };
         let challenge = Md5Resolver::new(input);
         let output = challenge.solve();
 
         assert_eq!(output.hashcode, "00441745D9BDF8E5D3C7872AC9DBB2C3");
-        assert_eq!(output.seed.to_string(), "000000000000034C".to_string());
+        assert_eq!(output.seed, 0x000000000000034C);
     }
 }
