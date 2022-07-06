@@ -1,6 +1,19 @@
 use std::net::TcpStream;
 use std::io::{Read, Write};
 
+/// Service to connect to the server and send messages to it
+///
+/// # Arguments
+///
+/// * `stream` - The stream to the server
+///
+/// # Example
+///
+/// ```rust
+/// service: Service {
+///     stream: TcpStream::connect("localhost:7878").unwrap()
+/// }
+/// ```
 pub struct Service
 {
     pub(crate) stream: TcpStream,
@@ -8,6 +21,19 @@ pub struct Service
 
 impl Service
 {
+    /// Send a message to the server
+    ///
+    /// # Arguments
+    ///
+    /// * `message` - The message to send to the server
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// let serialized_message = serde_json::to_string(&Message::ChallengeResult(challenge_result)).unwrap();
+    ///
+    /// self.service.send_message(&serialized_message);
+    /// ```
     pub(crate) fn send_message(&mut self, message: &str)
     {
         let message_size = message.len() as u32;
@@ -21,6 +47,11 @@ impl Service
         };
     }
 
+    /// Listen the server response and return it
+    ///
+    /// # Return
+    ///
+    /// * `String` - The server response as a string
     pub(crate) fn listen_to_response(&mut self) -> String
     {
         let mut buffer: &mut[u8] = &mut [0; 4];
@@ -37,6 +68,25 @@ impl Service
         };
     }
 
+    /// Send a message to the server and listen to the response
+    ///
+    /// # Arguments
+    ///
+    /// * `message` - The message to send to the server
+    ///
+    /// # Return
+    ///
+    /// * `String` - The server response as a string
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// let client_name = self.random.generate_name();
+    /// let serialized_message = serde_json::to_string(&Message::Subscribe(Subscribe {
+    ///     name: client_name.clone(),
+    /// })).unwrap();
+    /// let response = self.service.send_message_and_listen_to_response(&serialized_message);
+    /// ```
     pub(crate) fn send_message_and_listen_to_response(&mut self, message: &str) -> String
     {
         self.send_message(message);

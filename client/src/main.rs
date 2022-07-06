@@ -3,6 +3,7 @@ mod client;
 mod random;
 mod service;
 mod recoversecret;
+mod md5_resolver;
 
 use std::net::TcpStream;
 use clap::{Arg, App};
@@ -11,6 +12,8 @@ use crate::messages::{Message, MessageParser};
 use crate::random::Random;
 use crate::service::Service;
 
+
+/// Client main function
 fn main()
 {
     //parse CLI arguments to get server address
@@ -75,6 +78,21 @@ fn main()
     }
 }
 
+/// Connect to the server by specifying server address and port
+///
+/// # Arguments
+///
+/// * `address` - A string containing the server address and port
+///
+/// # Return
+///
+/// * `TcpStream` - A TcpStream object that can be used to communicate with the server
+///
+/// # Example
+///
+/// ```rust
+/// let mut stream: connect_to_server("localhost:7878");
+/// ```
 fn connect_to_server(address : &str) -> TcpStream
 {
     match TcpStream::connect(address) {
