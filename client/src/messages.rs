@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Message {
@@ -13,15 +13,14 @@ pub enum Message {
     EndOfGame(EndOfGame),
 }
 
-pub struct MessageParser {
-}
+pub struct MessageParser {}
 
 impl MessageParser {
     pub(crate) fn from_string(string_to_parse: &str) -> Message {
         let response: Result<Message, serde_json::Error> = serde_json::from_str(&string_to_parse);
         let message: Message = match response {
             Ok(m) => m,
-            Err(err) => panic!("cannot parse to Message : {err:?}")
+            Err(err) => panic!("cannot parse to Message : {err:?}"),
         };
         message
     }
@@ -36,7 +35,7 @@ pub struct Welcome {
 /// The client request to the server to subscribe to the game after the hello message
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Subscribe {
-    pub name: String
+    pub name: String,
 }
 
 /// The server response to the client after the client subscribe to the game
@@ -49,14 +48,14 @@ pub enum SubscribeResult {
 /// The list of players in the game
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PublicLeaderBoard {
-    pub leader_board: Vec<PublicPlayer>
+    pub leader_board: Vec<PublicPlayer>,
 }
 
 /// Contains the information about a player
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PublicPlayer {
     pub name: String,
-    pub stream_id: String,    
+    pub stream_id: String,
     pub score: i32,
     pub steps: u32,
     pub is_active: bool,
@@ -104,7 +103,7 @@ pub struct RecoverSecretOutput {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChallengeResult {
     pub answer: ChallengeAnswer,
-    pub next_target: String
+    pub next_target: String,
 }
 
 /// Contains the answer of the server to the challenge
@@ -113,32 +112,32 @@ pub enum ChallengeValue {
     Unreachable,
     Timeout,
     BadResult { used_time: f64, next_target: String },
-    Ok { used_time: f64, next_target: String }
+    Ok { used_time: f64, next_target: String },
 }
 
 /// Contains the answer of a challenge
 #[derive(Debug, Serialize, Deserialize)]
 pub enum ChallengeAnswer {
     MD5HashCash(MD5HashCashOutput),
-    RecoverSecret(RecoverSecretOutput)
+    RecoverSecret(RecoverSecretOutput),
 }
 
 /// Contains the information of a round
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RoundSummary {
     pub challenge: String,
-    pub chain: Vec<ReportedChallengeResult>
+    pub chain: Vec<ReportedChallengeResult>,
 }
 
 /// Contains the player's name and his answer to the challenge
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ReportedChallengeResult {
     pub name: String,
-    pub value: ChallengeValue
+    pub value: ChallengeValue,
 }
 
 /// Contains the information of the players at end of the game
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EndOfGame {
-    pub leader_board: Vec<PublicPlayer>
+    pub leader_board: Vec<PublicPlayer>,
 }

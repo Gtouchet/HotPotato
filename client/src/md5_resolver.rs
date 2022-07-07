@@ -1,14 +1,12 @@
-use std::time::{Duration, Instant};
-use crate::messages::{MD5HashCashInput, MD5HashCashOutput};
 use crate::challenge::Challenge;
+use crate::messages::{MD5HashCashInput, MD5HashCashOutput};
+use std::time::{Duration, Instant};
 
-pub struct Md5Resolver
-{
-    input: MD5HashCashInput
+pub struct Md5Resolver {
+    input: MD5HashCashInput,
 }
 
-impl Challenge for Md5Resolver
-{
+impl Challenge for Md5Resolver {
     type Input = MD5HashCashInput;
     type Output = MD5HashCashOutput;
 
@@ -17,9 +15,7 @@ impl Challenge for Md5Resolver
     }
 
     fn new(input: Self::Input) -> Self {
-        Md5Resolver {
-            input,
-        }
+        Md5Resolver { input }
     }
 
     fn solve(&self) -> Self::Output {
@@ -59,9 +55,9 @@ impl Challenge for Md5Resolver
 
 #[cfg(test)]
 mod tests {
+    use crate::challenge::Challenge;
     use crate::md5_resolver::Md5Resolver;
     use crate::messages::MD5HashCashInput;
-    use crate::challenge::Challenge;
 
     #[test]
     fn test() {

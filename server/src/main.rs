@@ -9,11 +9,11 @@ fn main() {
 
     let listener = match listener {
         Ok(l) => l,
-        Err(err) => panic!("Failed to bind to address : {err:?}")
+        Err(err) => panic!("Failed to bind to address : {err:?}"),
     };
-    
+
     // Showing any message sent from client to server.
     for message in listener.incoming() {
         println!("message={message:?}");
     }
-}   
+}

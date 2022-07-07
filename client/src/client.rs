@@ -1,8 +1,10 @@
+use crate::challenge::Challenge as ChallengeTrait;
+use crate::md5_resolver::Md5Resolver;
+use crate::messages::{
+    Challenge, ChallengeAnswer, ChallengeResult, PublicPlayer, RoundSummary, Subscribe,
+};
 use crate::recover_secret::RecoverSecret;
 use crate::{Message, Random, Service};
-use crate::md5_resolver::Md5Resolver;
-use crate::messages::{Challenge, ChallengeAnswer, ChallengeResult, PublicPlayer, RoundSummary, Subscribe};
-use crate::challenge::Challenge as ChallengeTrait;
 
 /// Client main function
 ///
@@ -23,19 +25,17 @@ use crate::challenge::Challenge as ChallengeTrait;
 ///     },
 /// };
 /// ```
-pub struct Client
-{
+pub struct Client {
     pub service: Service,
     pub random: Random,
 }
 
-impl Client
-{
+impl Client {
     /// Say hello to the server to start the conversation
-    pub(crate) fn say_hello(&mut self)
-    {
+    pub(crate) fn say_hello(&mut self) {
         let serialized_message = serde_json::to_string(&Message::Hello).unwrap();
-        self.service.send_message_and_listen_to_response(&serialized_message);
+        self.service
+            .send_message_and_listen_to_response(&serialized_message);
     }
 
     /// Subscribe to the server to get the next challenge
@@ -43,13 +43,17 @@ impl Client
     /// # Return
     ///
     /// * `(String, String)` - The server response as a map
-    pub(crate) fn subscribe(&mut self) -> (String, String)
-    {
+    pub(crate) fn subscribe(&mut self) -> (String, String) {
         let client_name = self.random.generate_name();
         let serialized_message = serde_json::to_string(&Message::Subscribe(Subscribe {
             name: client_name.clone(),
-        })).unwrap();
-        return (client_name, self.service.send_message_and_listen_to_response(&serialized_message));
+        }))
+        .unwrap();
+        return (
+            client_name,
+            self.service
+                .send_message_and_listen_to_response(&serialized_message),
+        );
     }
 
     /// Take a challenge to solve it, send the solution and a player to give the hot potato
@@ -70,12 +74,16 @@ impl Client
     ///     }
     /// }
     /// ```
-    pub(crate) fn handle_challenge(&mut self, challenge: Challenge, players_list: &mut Vec<String>, client_name: &String)
-    {
-        let challenge_answer : ChallengeAnswer = match challenge {
+    pub(crate) fn handle_challenge(
+        &mut self,
+        challenge: Challenge,
+        players_list: &mut Vec<String>,
+        client_name: &String,
+    ) {
+        let challenge_answer: ChallengeAnswer = match challenge {
             Challenge::RecoverSecret(input) => {
                 let recover_secret: RecoverSecret = ChallengeTrait::new(input);
-                ChallengeAnswer::RecoverSecret(recover_secret.solve())     
+                ChallengeAnswer::RecoverSecret(recover_secret.solve())
             }
             Challenge::MD5HashCash(input) => {
                 let md5_resolver = Md5Resolver::new(input);
@@ -87,17 +95,18 @@ impl Client
         }
         let challenge_result = ChallengeResult {
             //TODO rework this
-            next_target: players_list[self.random.get_number(0, players_list.len() - 1)].to_string(),
-            answer: challenge_answer
+            next_target: players_list[self.random.get_number(0, players_list.len() - 1)]
+                .to_string(),
+            answer: challenge_answer,
         };
-    
-        let serialized_message = serde_json::to_string(&Message::ChallengeResult(challenge_result)).unwrap();
+
+        let serialized_message =
+            serde_json::to_string(&Message::ChallengeResult(challenge_result)).unwrap();
 
         self.service.send_message(&serialized_message);
     }
 
-    pub(crate) fn listen_to_response(&mut self) -> String
-    {
+    pub(crate) fn listen_to_response(&mut self) -> String {
         return self.service.listen_to_response();
     }
 
@@ -118,24 +127,22 @@ impl Client
     ///     }
     /// }
     /// ```
-    pub(crate) fn display_leaderboard(&mut self, players: &Vec<PublicPlayer>)
-    {
+    pub(crate) fn display_leaderboard(&mut self, players: &Vec<PublicPlayer>) {
         println!("----- Leaderboard -----\n");
-        players.iter()
-            .for_each(|p| println!(
+        players.iter().for_each(|p| {
+            println!(
                 "Player {}:\n\
                 - Score: {}\n\
                 - Steps: {}\n\
                 - Active: {}\n\
                 - Used time: {}\n",
-                p.name, p.score, p.steps, p.is_active, p.total_used_time)
+                p.name, p.score, p.steps, p.is_active, p.total_used_time
             )
+        })
     }
 
-    pub(crate) fn display_round_summary(&mut self, round_summary: RoundSummary)
-    {
+    pub(crate) fn display_round_summary(&mut self, round_summary: RoundSummary) {
         println!("----- Round summary -----\n");
-        println!("round number: {}",round_summary.chain.len().to_string());
+        println!("round number: {}", round_summary.chain.len().to_string());
     }
 }
-
