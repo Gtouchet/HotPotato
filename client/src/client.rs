@@ -1,7 +1,7 @@
 use crate::recover_secret::RecoverSecret;
 use crate::{Message, Random, Service};
 use crate::md5_resolver::Md5Resolver;
-use crate::messages::{Challenge, ChallengeAnswer, ChallengeResult, PublicPlayer, MD5HashCashOutput, RoundSummary, Subscribe};
+use crate::messages::{Challenge, ChallengeAnswer, ChallengeResult, PublicPlayer, RoundSummary, Subscribe};
 use crate::challenge::Challenge as ChallengeTrait;
 
 /// Client main function
