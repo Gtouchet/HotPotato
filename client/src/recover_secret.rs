@@ -1,19 +1,5 @@
 use crate::messages::{RecoverSecretInput, RecoverSecretOutput};
-
-pub(crate) trait Challenge {
-    /// Données en entrée du challenge
-    type Input;
-    /// Données en sortie du challenge
-    type Output;
-    /// Nom du challenge
-    fn name() -> String;
-    /// Create a challenge from the specific input
-    fn new(input: Self::Input) -> Self;
-    /// Résout le challenge
-    fn solve(&self) -> Self::Output;
-    /// Vérifie qu'une sortie est valide pour le challenge
-    fn verify(&self, answer: &Self::Output) -> bool;
-}
+use crate::challenge::Challenge;
 
 pub struct RecoverSecret {
     input: RecoverSecretInput
@@ -102,7 +88,7 @@ impl Challenge for RecoverSecret {
 
 #[cfg(test)]
 mod tests {
-    use crate::recoversecret::*;
+    use crate::recover_secret::*;
 
     #[test]
     fn it_works() {

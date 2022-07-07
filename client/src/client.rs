@@ -1,7 +1,8 @@
-use crate::{Message, Random, Service, recoversecret};
+use crate::recover_secret::RecoverSecret;
+use crate::{Message, Random, Service};
 use crate::md5_resolver::Md5Resolver;
 use crate::messages::{Challenge, ChallengeAnswer, ChallengeResult, PublicPlayer, MD5HashCashOutput, RoundSummary, Subscribe};
-use crate::recoversecret::{*, Challenge as ChallengeTrait};
+use crate::challenge::Challenge as ChallengeTrait;
 
 /// Client main function
 ///
@@ -73,7 +74,7 @@ impl Client
     {
         let challenge_answer : ChallengeAnswer = match challenge {
             Challenge::RecoverSecret(input) => {
-                let recover_secret: RecoverSecret = recoversecret::Challenge::new(input);
+                let recover_secret: RecoverSecret = ChallengeTrait::new(input);
                 ChallengeAnswer::RecoverSecret(recover_secret.solve())     
             }
             Challenge::MD5HashCash(input) => {

@@ -1,6 +1,6 @@
 use std::time::{Duration, Instant};
 use crate::messages::{MD5HashCashInput, MD5HashCashOutput};
-use crate::recoversecret::Challenge;
+use crate::challenge::Challenge;
 
 pub struct Md5Resolver
 {
@@ -61,7 +61,7 @@ impl Challenge for Md5Resolver
 mod tests {
     use crate::md5_resolver::Md5Resolver;
     use crate::messages::MD5HashCashInput;
-    use crate::recoversecret::Challenge;
+    use crate::challenge::Challenge;
 
     #[test]
     fn test() {

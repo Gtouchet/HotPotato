@@ -2,8 +2,9 @@ mod messages;
 mod client;
 mod random;
 mod service;
-mod recoversecret;
+mod recover_secret;
 mod md5_resolver;
+mod challenge;
 
 use std::net::TcpStream;
 use clap::{Arg, App};
