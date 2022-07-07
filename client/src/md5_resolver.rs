@@ -1,3 +1,4 @@
+use std::time::{Duration, Instant};
 use crate::messages::{MD5HashCashInput, MD5HashCashOutput};
 use crate::recoversecret::Challenge;
 
@@ -24,6 +25,7 @@ impl Challenge for Md5Resolver
     fn solve(&self) -> Self::Output {
         let mut seed = 0;
 
+        let start = Instant::now();
         let mut digest;
         loop {
             digest = md5::compute(format!("{:016X}{}", seed, self.input.message));
@@ -36,6 +38,10 @@ impl Challenge for Md5Resolver
             }
 
             seed += 1;
+            if start.elapsed() > Duration::from_millis(1_500) {
+                println!("\n\n\n\nTOOK TOO LONG\n\n\n\n");
+                break;
+            }
         }
 
         let digest_str = format!("{:32X}", digest);
