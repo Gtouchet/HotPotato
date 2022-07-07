@@ -2,7 +2,7 @@ mod messages;
 mod client;
 mod random;
 mod service;
-mod recoversecret;
+mod recover_secret;
 mod md5_resolver;
 
 use std::net::TcpStream;

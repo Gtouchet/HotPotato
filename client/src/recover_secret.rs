@@ -102,7 +102,7 @@ impl Challenge for RecoverSecret {
 
 #[cfg(test)]
 mod tests {
-    use crate::recoversecret::*;
+    use crate::recover_secret::*;
 
     #[test]
     fn it_works() {
