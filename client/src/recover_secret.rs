@@ -6,9 +6,9 @@ pub struct RecoverSecret {
 }
 
 impl RecoverSecret {
-    pub fn swap(secret_sentence: &str, first_index: usize, second_index: usize) -> String {
+    pub fn swap(secret_sentence: &str, first_char_index: usize, second_char_index: usize) -> String {
         let mut chars: Vec<_> = secret_sentence.chars().collect();
-        chars.swap(first_index, second_index);
+        chars.swap(first_char_index, second_char_index);
         chars.into_iter().collect()
     }
 }
@@ -30,7 +30,8 @@ impl Challenge for RecoverSecret {
         let mut secret_sentence = String::new();
         let mut have_changed = true;
 
-        while have_changed {
+        while have_changed
+        {
             let mut last_index = 0;
             have_changed = false;
 
@@ -40,16 +41,20 @@ impl Challenge for RecoverSecret {
                 {
                     let char = &self.input.letters[index..=index];
 
-                    if !secret_sentence.contains(char) {
-                        secret_sentence.push_str(char);
-                    } else if index != last_index
+                    if !secret_sentence.contains(char)
                     {
-                        let first_index = secret_sentence.rfind(char).unwrap();
-                        let second_index = secret_sentence.rfind(&self.input.letters[index - 1..=index - 1]).unwrap();
+                        secret_sentence.push_str(char);
+                    }
+                    else if index != last_index
+                    {
+                        let previous_char = &self.input.letters[index - 1..=index - 1];
 
-                        if first_index < second_index
+                        let first_char_index = secret_sentence.rfind(char).unwrap();
+                        let second_char_index = secret_sentence.rfind(previous_char).unwrap();
+
+                        if first_char_index < second_char_index
                         {
-                            secret_sentence = RecoverSecret::swap(&secret_sentence, first_index, second_index);
+                            secret_sentence = RecoverSecret::swap(&secret_sentence, first_char_index, second_char_index);
                             have_changed = true;
                         }
                     }
@@ -66,16 +71,16 @@ impl Challenge for RecoverSecret {
 
         for tuple_size in &self.input.tuple_sizes
         {
-            let mut tuple_indexes : Vec<usize> = Vec::new();
+            let mut char_indexes_in_answer : Vec<usize> = Vec::new();
 
             for index in last_index..(*tuple_size + last_index)
             {
-                let c = self.input.letters.chars().nth(index).unwrap();
-                tuple_indexes.push( answer.secret_sentence.find(c).unwrap());
+                let char_at_index = self.input.letters.chars().nth(index).unwrap();
+                char_indexes_in_answer.push(answer.secret_sentence.find(char_at_index).unwrap());
             }
-            for i in 0..tuple_indexes.len() - 1
+            for i in 0..char_indexes_in_answer.len() - 1
             {
-                if tuple_indexes[i] > tuple_indexes[i + 1]
+                if char_indexes_in_answer[i] > char_indexes_in_answer[i + 1]
                 {
                     return false;
                 }
