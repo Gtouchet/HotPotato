@@ -94,7 +94,6 @@ impl Client {
             players_list.remove(index);
         }
         let challenge_result = ChallengeResult {
-            //TODO rework this
             next_target: players_list[self.random.get_number(0, players_list.len() - 1)]
                 .to_string(),
             answer: challenge_answer,

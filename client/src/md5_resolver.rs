@@ -49,7 +49,10 @@ impl Challenge for Md5Resolver {
     }
 
     fn verify(&self, answer: &Self::Output) -> bool {
-        todo!()
+        let digest = md5::compute(format!("{:016X}{}", answer.seed, self.input.message));
+        let digest_str = format!("{:32X}", digest);
+
+        digest_str == answer.hashcode
     }
 }
 
